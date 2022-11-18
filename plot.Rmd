@@ -1,0 +1,115 @@
+---
+title: "Traceplot"
+# author: "Zhuofan"
+date: '2022-11-17'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### the data is generated as follows
+The model is formulated as $y=\pi M x+(1-\pi)e$, here we set $\pi$ to 0.8
+```{r,eval=FALSE}
+set.seed(2)
+x = t(rdirichlet(n,rep(0.01,px)))
+e = t(rdirichlet(n,rep(0.1,py)))
+m = matrix(rgamma(px * py, 1 / py, 1), py, px)
+m = t(t(m) / colSums(m))
+y = 0.8 * m %*% x + 0.2 * e
+
+```
+
+
+```{r ,echo=FALSE}
+load("init1.RData")
+plot(rec,type = "l",ylab="loglikelihood")
+abline(h=truell,lwd=1,col="blue")
+ legend("topright",c(" true loglikelihood is 2349"))
+title(main = "traceplot of loglikelihood when the initial value is true value")
+```
+
+```{r, echo=FALSE}
+plot(paramstrue$cstar,type="l",ylim = c(0.792,0.800001))
+abline(h=0.8,lwd=1,col="blue")
+legend("topright",c("blue: ture pi","black:sample pi traceplot"))
+title(main = "traceplot of pi when the initial value is ture value")
+```
+
+```{r,echo=FALSE ,include=FALSE}
+library(gridGraphics)
+library(grid)
+heatmap((m), Rowv = NA, Colv = NA)
+grab_grob <- function(){
+  grid.echo()
+  grid.grab()
+}
+g1 <- grab_grob()
+sam_mest <- apply(paramstrue$mt,c(2,3),mean)
+heatmap((sam_mest), Rowv = NA, Colv = NA)
+g2 <- grab_grob()
+```
+## true M (left) and estimated M (right) when the initial value is true value
+```{r,echo=FALSE}
+grid.newpage()
+
+# library(gridExtra)
+# grid.arrange(g,g, ncol=2, clip=TRUE)
+
+lay <- grid.layout(nrow = 1, ncol=2)
+pushViewport(viewport(layout = lay))
+grid.draw(editGrob(g1, vp=viewport(layout.pos.row = 1, 
+                                  layout.pos.col = 1, clip=TRUE)))
+grid.draw(editGrob(g2, vp=viewport(layout.pos.row = 1, 
+                                  layout.pos.col = 2, clip=TRUE)))
+upViewport(1)
+```
+
+
+```{r,echo=FALSE}
+plot(rec2,type = "l",ylab="loglikelihood")
+abline(h=truell,lwd=1,col="blue")
+ legend("topright",c(" true loglikelihood is 2349"))
+title(main = "traceplot of loglikelihood when the initial value is random")
+```
+
+```{r, echo=FALSE}
+plot(params$cstar,type="l")
+abline(h=0.8,lwd=1,col="blue")
+ legend("topright",c("true value is 0.8"))
+title(main = "traceplot of pi when the initial value is random")
+```
+
+## true M (left) and estimated M (right) when the initial value is random
+
+```{r,echo=FALSE ,include=FALSE}
+library(gridGraphics)
+library(grid)
+heatmap((m), Rowv = NA, Colv = NA)
+grab_grob <- function(){
+  grid.echo()
+  grid.grab()
+}
+g1 <- grab_grob()
+sam_mest <- apply(params$mt,c(2,3),mean)
+heatmap((sam_mest), Rowv = NA, Colv = NA)
+g2 <- grab_grob()
+```
+```{r,echo=FALSE}
+grid.newpage()
+
+# library(gridExtra)
+# grid.arrange(g,g, ncol=2, clip=TRUE)
+
+lay <- grid.layout(nrow = 1, ncol=2)
+pushViewport(viewport(layout = lay))
+grid.draw(editGrob(g1, vp=viewport(layout.pos.row = 1, 
+                                  layout.pos.col = 1, clip=TRUE)))
+grid.draw(editGrob(g2, vp=viewport(layout.pos.row = 1, 
+                                  layout.pos.col = 2, clip=TRUE)))
+upViewport(1)
+```
+
